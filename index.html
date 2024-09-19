@@ -5,18 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robot Professeur</title>
     <style>
+        /* General Page Styles */
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 20%;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;  /* Light blue background */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
+
+        /* Main container */
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            max-width: 100%;
+        }
+
+        /* Large heading for the page */
         h1 {
             font-size: 24px;
-            color: #333;
+            color: #2c3e50; /* Dark blue for a professional look */
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* Chat widget styles */
+        .chat-container {
+            background-color: #f4f6f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: #ffffff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .user-input {
+            width: calc(100% - 60px);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .send-btn {
+            width: 50px;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .send-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Add a school/teaching theme */
+        .teaching-theme {
+            background-color: #e8f4f8;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+        }
+
+        .messages .bot {
+            color: #2e86de;
+            font-weight: bold;
+        }
+
+        .messages .user {
+            color: #2c3e50;
+            text-align: right;
         }
     </style>
 </head>
 <body>
-    <h1>ce robot professeur remplacera votre professeur classique</h1>
+
+<div class="container">
+    <!-- Big title at the top -->
+    <h1>Ce robot professeur remplacera votre professeur traditionnel.</h1>
+
+    <!-- Chat widget container -->
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        <input type="text" id="userInput" class="user-input" placeholder="Tapez votre message ici...">
+        <button class="send-btn" onclick="sendMessage()">Envoyer</button>
+    </div>
+
+    <!-- Teaching theme (optional additional section for aesthetic) -->
+    <div class="teaching-theme">
+        <p>Apprenez avec l'aide de votre assistant virtuel, disponible à tout moment pour répondre à vos questions!</p>
+    </div>
+</div>
+
+<script>
+    const apiEndpoint = "YOUR_VERTEX_AI_CHATBOT_API_ENDPOINT";  // Replace with your API endpoint
+
+    function sendMessage() {
+        const userMessage = document.getElementById("userInput").value;
+        if (!userMessage) return;
+
+        // Display user message
+        displayMessage(userMessage, 'user');
+
+        // Call chatbot API
+        fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer YOUR_AUTH_TOKEN'  // Optional, if API requires authentication
+            },
+            body: JSON.stringify({
+                "query": userMessage,
+                "session_id": "unique_session_id"  // Optional, manage session for context-based conversations
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const botResponse = data.reply || "Désolé, je n'ai pas compris cela.";
+            displayMessage(botResponse, 'bot');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            displayMessage("Erreur de communication avec le chatbot.", 'bot');
+        });
+
+        // Clear input field
+        document.getElementById("userInput").value = '';
+    }
+
+    function displayMessage(message, sender) {
+        const messageContainer = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = sender === 'user' ? `Vous: ${message}` : `Robot: ${message}`;
+        messageElement.className = sender;
+        messageContainer.appendChild(messageElement);
+        messageContainer.scrollTop = messageContainer.scrollHeight;  // Scroll to the latest message
+    }
+</script>
+
 </body>
 </html>
